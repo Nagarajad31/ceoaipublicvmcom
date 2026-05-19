@@ -71,35 +71,30 @@
 
 <script>
     // ============================================================
-    // YOUR CLOUDFLARE WORKER URL (the one that generates AI content)
+    // YOUR CLOUDFLARE WORKER URL
     // ============================================================
     const WORKER_URL = "https://fancy-pine-1532.nagarajad329.workers.dev";
     
-    let sitekey = null;
+    // FIX: Direct sitekey (no fetch needed - avoids CORS)
+    const SITEKEY = "674419e8-2728-4a50-acdc-0ccc37b25432";
     
-    // Load sitekey from Cloudflare Worker
-    async function loadSitekey() {
-        try {
-            const response = await fetch(WORKER_URL);
-            const data = await response.json();
-            sitekey = data.sitekey;
-            
-            // Render hCaptcha
+    // Render hCaptcha directly with sitekey
+    window.addEventListener('load', function() {
+        if (typeof hcaptcha !== 'undefined') {
             hcaptcha.render('hcaptcha-container', {
-                sitekey: sitekey,
+                sitekey: SITEKEY,
                 callback: function(token) {
+                    console.log("hCaptcha verified!");
                     document.getElementById('error').style.display = 'none';
                 },
                 'expired-callback': function() {
-                    // Token expired, user needs to verify again
+                    console.log("hCaptcha expired");
                 }
             });
-        } catch (err) {
-            console.error("Failed to load sitekey:", err);
+        } else {
+            console.error("hCaptcha not loaded");
         }
-    }
-    
-    loadSitekey();
+    });
     
     const generateBtn = document.getElementById('generateBtn');
     const loadingDiv = document.getElementById('loading');
@@ -107,6 +102,13 @@
     const errorDiv = document.getElementById('error');
     const topicInput = document.getElementById('topic');
     const typeSelect = document.getElementById('type');
+    
+    let captchaToken = null;
+    
+    // Set captcha token when user completes
+    window.hcaptchaCallback = function(token) {
+        captchaToken = token;
+    };
 
     function setLoading(isLoading) {
         loadingDiv.style.display = isLoading ? 'block' : 'none';
@@ -128,6 +130,11 @@
     }
 
     async function generate() {
+        if (!captchaToken) {
+            showError("⚠️ Please complete the hCaptcha verification first.");
+            return;
+        }
+        
         const topic = topicInput.value.trim();
         if (!topic) {
             showError("Please enter a topic");
@@ -147,7 +154,6 @@
         setLoading(true);
         
         try {
-            // Call Cloudflare Worker to generate AI content
             const response = await fetch(WORKER_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -159,14 +165,20 @@
             if (data.success && data.content) {
                 showResult(data.content);
             } else {
-                showResult("✨ Here's your AI-generated content about: " + topic + "\n\nComplete the CPAGrip offer above to unlock unlimited generations!");
+                showResult("✨ Here's your AI-generated content about: " + topic + "\n\nComplete the offer above to unlock more!");
             }
         } catch (err) {
             console.error(err);
-            showResult("✨ Here's your AI-generated content about: " + topic + "\n\nComplete the CPAGrip offer above to unlock unlimited generations!");
+            showResult("✨ Here's your AI-generated content about: " + topic + "\n\nComplete the offer above to unlock more!");
         }
         
         setLoading(false);
+        
+        // Reset captcha after generation
+        if (typeof hcaptcha !== 'undefined') {
+            hcaptcha.reset();
+            captchaToken = null;
+        }
     }
 
     generateBtn.addEventListener('click', generate);
