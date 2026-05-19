@@ -3,335 +3,421 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Content Studio | Your Personal AI Writer</title>
+    <title>AI Reviews - What Users Think</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:system-ui,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px;}
-        .container{max-width:1200px;margin:0 auto;}
-        .main-card{background:white;border-radius:28px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);overflow:hidden;}
-        .header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:2rem;text-align:center;}
-        .header h1{font-size:1.8rem;margin-bottom:0.3rem;}
-        .content{padding:2rem;}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
-        /* Auth Forms */
-        .auth-container{max-width:400px;margin:0 auto;text-align:center;}
-        .auth-input{width:100%;padding:0.8rem;margin:0.5rem 0;border:1.5px solid #e5e7eb;border-radius:16px;font-size:1rem;}
-        .auth-btn{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;padding:0.8rem 2rem;border-radius:40px;cursor:pointer;font-size:1rem;font-weight:600;margin-top:1rem;}
-        .toggle-link{color:#667eea;cursor:pointer;margin-top:1rem;display:inline-block;}
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+        }
         
-        /* Dashboard */
-        .dashboard{display:none;}
-        .user-info{background:#f0fdf4;padding:1rem;border-radius:16px;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;}
-        .logout-btn{background:#dc2626;color:white;border:none;padding:0.5rem 1rem;border-radius:40px;cursor:pointer;}
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
         
-        /* Two Columns */
-        .two-columns{display:flex;gap:2rem;flex-wrap:wrap;}
-        .generator{flex:2;min-width:300px;}
-        .history{flex:1;min-width:250px;background:#f9fafb;border-radius:24px;padding:1.5rem;}
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
         
-        .input-group{margin-bottom:1.5rem;}
-        label{font-weight:600;display:block;margin-bottom:0.5rem;color:#1f2937;}
-        textarea,select{width:100%;padding:0.8rem;border:1.5px solid #e5e7eb;border-radius:16px;font-size:1rem;font-family:inherit;}
-        button{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;padding:0.8rem;font-size:1rem;font-weight:600;border-radius:40px;cursor:pointer;width:100%;}
-        .loading{text-align:center;padding:2rem;display:none;}
-        .spinner{width:40px;height:40px;border:3px solid #e5e7eb;border-top-color:#667eea;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem;}
-        @keyframes spin{to{transform:rotate(360deg);}}
-        .result{margin-top:2rem;padding:1.5rem;background:#f9fafb;border-radius:24px;display:none;white-space:pre-wrap;line-height:1.6;}
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
         
-        .history-item{background:white;padding:1rem;border-radius:16px;margin-bottom:1rem;cursor:pointer;transition:all 0.2s;}
-        .history-item:hover{background:#e0e7ff;transform:translateX(5px);}
-        .history-title{font-weight:600;margin-bottom:0.3rem;color:#333;}
-        .history-date{font-size:0.7rem;color:#6b7280;}
-        .history-preview{font-size:0.8rem;color:#6b7280;margin-top:0.5rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        /* AI Cards */
+        .ai-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
         
-        .stats{display:flex;gap:1rem;margin-top:1rem;}
-        .stat-card{flex:1;background:white;padding:1rem;border-radius:16px;text-align:center;}
-        .stat-number{font-size:1.5rem;font-weight:700;color:#667eea;}
-        .stat-label{font-size:0.7rem;color:#6b7280;}
+        .ai-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
         
-        .error{color:#dc2626;background:#fef2f2;padding:1rem;border-radius:16px;margin-top:1rem;display:none;}
+        .ai-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .ai-category {
+            background: #e0e0e0;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #555;
+        }
+        
+        .rating {
+            color: #ffc107;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .rating-number {
+            color: #333;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        
+        .ai-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        /* Review Form */
+        .review-form {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        
+        .star-rating {
+            display: flex;
+            gap: 5px;
+            margin: 10px 0;
+            direction: rtl;
+        }
+        
+        .star-rating input {
+            display: none;
+        }
+        
+        .star-rating label {
+            font-size: 25px;
+            color: #ddd;
+            cursor: pointer;
+            direction: ltr;
+        }
+        
+        .star-rating input:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #ffc107;
+        }
+        
+        .review-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: Arial, sans-serif;
+            resize: vertical;
+        }
+        
+        .submit-review {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .submit-review:hover {
+            background: #218838;
+        }
+        
+        /* Reviews List */
+        .reviews-list {
+            margin-top: 15px;
+        }
+        
+        .review-item {
+            background: #fafafa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid #ffc107;
+        }
+        
+        .review-user {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .review-user span {
+            font-size: 12px;
+            color: #888;
+            font-weight: normal;
+        }
+        
+        .review-stars {
+            color: #ffc107;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .review-text {
+            color: #555;
+            line-height: 1.4;
+        }
+        
+        .improvement {
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #eee;
+        }
+        
+        .good {
+            color: #28a745;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        
+        .no-reviews {
+            color: #999;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .stat {
+            background: #f5f5f5;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="main-card">
-        <div class="header">
-            <h1>✨ AI Content Studio</h1>
-            <p>Your Personal AI Content Generator</p>
-        </div>
-        <div class="content">
-            <!-- Login/Signup Section -->
-            <div id="authSection">
-                <div class="auth-container">
-                    <h2 id="authTitle">Login</h2>
-                    <div id="loginForm">
-                        <input type="email" id="loginEmail" class="auth-input" placeholder="Email">
-                        <input type="password" id="loginPassword" class="auth-input" placeholder="Password">
-                        <button class="auth-btn" onclick="login()">Login</button>
-                        <div><span class="toggle-link" onclick="showSignup()">Don't have an account? Sign Up</span></div>
-                    </div>
-                    <div id="signupForm" style="display:none;">
-                        <input type="text" id="signupName" class="auth-input" placeholder="Full Name">
-                        <input type="email" id="signupEmail" class="auth-input" placeholder="Email">
-                        <input type="password" id="signupPassword" class="auth-input" placeholder="Password">
-                        <button class="auth-btn" onclick="signup()">Sign Up</button>
-                        <div><span class="toggle-link" onclick="showLogin()">Already have an account? Login</span></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Dashboard (after login) -->
-            <div id="dashboard" class="dashboard">
-                <div class="user-info">
-                    <div>
-                        <strong>👋 Welcome, <span id="userName"></span>!</strong><br>
-                        <small>Your AI content studio</small>
-                    </div>
-                    <button class="logout-btn" onclick="logout()">Logout</button>
-                </div>
-                
-                <div class="stats">
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalGenerations">0</div>
-                        <div class="stat-label">Total Generations</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="thisWeek">0</div>
-                        <div class="stat-label">This Week</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">🎯</div>
-                        <div class="stat-label">Premium Access</div>
-                    </div>
-                </div>
-                
-                <div class="two-columns">
-                    <div class="generator">
-                        <div class="input-group">
-                            <label>🧠 Topic</label>
-                            <textarea id="topic" rows="3" placeholder="e.g., How to stay productive, Benefits of meditation, Social media tips..."></textarea>
-                        </div>
-                        <div class="input-group">
-                            <label>📌 Content type</label>
-                            <select id="type">
-                                <option value="blog">📝 Blog Post</option>
-                                <option value="social">📱 Social Media Caption</option>
-                                <option value="email">✉️ Newsletter</option>
-                            </select>
-                        </div>
-                        <button id="generateBtn">✨ Generate Content</button>
-                        <div class="loading" id="loading"><div class="spinner"></div><p>AI is writing...</p></div>
-                        <div class="result" id="result"></div>
-                        <div class="error" id="error"></div>
-                    </div>
-                    
-                    <div class="history">
-                        <h3>📜 Your Content History</h3>
-                        <div id="historyList" style="margin-top:1rem;">
-                            <p style="color:#6b7280;text-align:center;">No content generated yet. Create your first piece!</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <h1>🤖 AI Tools Reviews</h1>
+    <p class="subtitle">Real users share their experience with popular AI tools</p>
+    
+    <div id="aiContainer"></div>
 </div>
 
-<script src="https://www.cpagrip.com/show/YOUR_LOCKER_ID"></script>
-
 <script>
-    // User data storage
-    let currentUser = null;
-    let users = JSON.parse(localStorage.getItem('ai_users') || '{}');
-    let contentHistory = JSON.parse(localStorage.getItem('ai_history') || '{}');
+    // AI Tools Data
+    const aiTools = [
+        {
+            id: 1,
+            name: "ChatGPT",
+            category: "Chatbot / Writing",
+            description: "Most popular AI chatbot. Great for conversations, writing, coding, and brainstorming.",
+            icon: "💬"
+        },
+        {
+            id: 2,
+            name: "Google Gemini",
+            category: "Multimodal AI",
+            description: "Google's AI that can understand text, images, video, and audio. Very powerful for research.",
+            icon: "🌟"
+        },
+        {
+            id: 3,
+            name: "Claude (Anthropic)",
+            category: "Chatbot / Analysis",
+            description: "Excellent for long documents, analysis, and safe responses. Great for business use.",
+            icon: "📄"
+        },
+        {
+            id: 4,
+            name: "Midjourney",
+            category: "AI Image Generator",
+            description: "Best for artistic images. Creates stunning artwork from text descriptions.",
+            icon: "🎨"
+        },
+        {
+            id: 5,
+            name: "Perplexity AI",
+            category: "Research Assistant",
+            description: "AI search engine with citations. Great for fact-checking and research.",
+            icon: "🔍"
+        },
+        {
+            id: 6,
+            name: "DeepSeek",
+            category: "Chatbot / Coding",
+            description: "Free and powerful. Great for coding and reasoning tasks.",
+            icon: "💻"
+        },
+        {
+            id: 7,
+            name: "Leonardo.ai",
+            category: "Image Generator",
+            description: "Free image generation with good quality. Good for game assets.",
+            icon: "🎮"
+        },
+        {
+            id: 8,
+            name: "Copy.ai",
+            category: "Marketing Copy",
+            description: "Specialized for marketing content, ads, and social media posts.",
+            icon: "📢"
+        },
+        {
+            id: 9,
+            name: "Grammarly",
+            category: "Writing Assistant",
+            description: "Grammar checking and writing improvement. Good for professional writing.",
+            icon: "✍️"
+        },
+        {
+            id: 10,
+            name: "Hugging Face",
+            category: "AI Platform",
+            description: "Open source AI models. Great for developers and researchers.",
+            icon: "🤗"
+        }
+    ];
     
-    const WORKER_URL = "https://yellow-mud-f965.nagarajad329.workers.dev";
+    // Load saved reviews from localStorage
+    let allReviews = JSON.parse(localStorage.getItem('ai_reviews')) || {};
     
-    function showSignup() {
-        document.getElementById('loginForm').style.display = 'none';
-        document.getElementById('signupForm').style.display = 'block';
-        document.getElementById('authTitle').innerText = 'Sign Up';
+    function saveReviews() {
+        localStorage.setItem('ai_reviews', JSON.stringify(allReviews));
     }
     
-    function showLogin() {
-        document.getElementById('signupForm').style.display = 'none';
-        document.getElementById('loginForm').style.display = 'block';
-        document.getElementById('authTitle').innerText = 'Login';
+    function getAverageRating(aiId) {
+        const reviews = allReviews[aiId] || [];
+        if (reviews.length === 0) return 0;
+        const total = reviews.reduce((sum, r) => sum + r.rating, 0);
+        return (total / reviews.length).toFixed(1);
     }
     
-    function signup() {
-        const name = document.getElementById('signupName').value;
-        const email = document.getElementById('signupEmail').value;
-        const password = document.getElementById('signupPassword').value;
-        
-        if (!name || !email || !password) {
-            alert("Please fill all fields");
+    function renderStars(rating) {
+        let stars = '';
+        for (let i = 1; i <= 5; i++) {
+            stars += i <= rating ? '★' : '☆';
+        }
+        return stars;
+    }
+    
+    function submitReview(aiId) {
+        const ratingInput = document.querySelector(`input[name="rating_${aiId}"]:checked`);
+        if (!ratingInput) {
+            alert("Please select a rating");
             return;
         }
         
-        if (users[email]) {
-            alert("User already exists!");
+        const rating = parseInt(ratingInput.value);
+        const reviewText = document.getElementById(`review_${aiId}`).value;
+        const improvementText = document.getElementById(`improvement_${aiId}`).value;
+        const goodText = document.getElementById(`good_${aiId}`).value;
+        
+        if (!reviewText.trim()) {
+            alert("Please write a review");
             return;
         }
         
-        users[email] = { name, password, createdAt: new Date().toISOString() };
-        localStorage.setItem('ai_users', JSON.stringify(users));
+        const newReview = {
+            id: Date.now(),
+            user: "User_" + Math.floor(Math.random() * 1000),
+            rating: rating,
+            review: reviewText,
+            good: goodText || "",
+            improvement: improvementText || "",
+            date: new Date().toLocaleDateString()
+        };
         
-        // Auto login after signup
-        currentUser = { email, name };
-        localStorage.setItem('ai_current_user', JSON.stringify(currentUser));
+        if (!allReviews[aiId]) allReviews[aiId] = [];
+        allReviews[aiId].push(newReview);
+        saveReviews();
         
-        // Initialize empty history for this user
-        if (!contentHistory[email]) {
-            contentHistory[email] = [];
-            localStorage.setItem('ai_history', JSON.stringify(contentHistory));
-        }
+        // Clear form
+        document.getElementById(`review_${aiId}`).value = '';
+        document.getElementById(`improvement_${aiId}`).value = '';
+        document.getElementById(`good_${aiId}`).value = '';
+        document.querySelector(`input[name="rating_${aiId}"]:checked`).checked = false;
         
-        loadDashboard();
+        // Refresh display
+        displayAI();
     }
     
-    function login() {
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
+    function displayAI() {
+        const container = document.getElementById('aiContainer');
+        container.innerHTML = '';
         
-        if (!users[email] || users[email].password !== password) {
-            alert("Invalid credentials");
-            return;
-        }
-        
-        currentUser = { email, name: users[email].name };
-        localStorage.setItem('ai_current_user', JSON.stringify(currentUser));
-        loadDashboard();
-    }
-    
-    function logout() {
-        currentUser = null;
-        localStorage.removeItem('ai_current_user');
-        document.getElementById('authSection').style.display = 'block';
-        document.getElementById('dashboard').style.display = 'none';
-        document.getElementById('loginForm').style.display = 'block';
-        document.getElementById('signupForm').style.display = 'none';
-        document.getElementById('authTitle').innerText = 'Login';
-    }
-    
-    function loadDashboard() {
-        document.getElementById('authSection').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-        document.getElementById('userName').innerText = currentUser.name;
-        
-        // Load user's history
-        const userHistory = contentHistory[currentUser.email] || [];
-        updateHistoryDisplay(userHistory);
-        updateStats(userHistory);
-    }
-    
-    function updateHistoryDisplay(history) {
-        const historyDiv = document.getElementById('historyList');
-        if (!history || history.length === 0) {
-            historyDiv.innerHTML = '<p style="color:#6b7280;text-align:center;">No content generated yet. Create your first piece!</p>';
-            return;
-        }
-        
-        historyDiv.innerHTML = history.slice().reverse().map(item => `
-            <div class="history-item" onclick="loadHistoryContent(${item.id})">
-                <div class="history-title">📝 ${item.title.substring(0, 50)}</div>
-                <div class="history-date">${item.date}</div>
-                <div class="history-preview">${item.content.substring(0, 80)}...</div>
-            </div>
-        `).join('');
-    }
-    
-    function updateStats(history) {
-        const total = history.length;
-        const thisWeek = history.filter(item => {
-            const itemDate = new Date(item.timestamp);
-            const weekAgo = new Date();
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            return itemDate > weekAgo;
-        }).length;
-        
-        document.getElementById('totalGenerations').innerText = total;
-        document.getElementById('thisWeek').innerText = thisWeek;
-    }
-    
-    function loadHistoryContent(id) {
-        const userHistory = contentHistory[currentUser.email] || [];
-        const item = userHistory.find(h => h.id === id);
-        if (item) {
-            document.getElementById('result').innerHTML = item.content.replace(/\n/g, '<br>');
-            document.getElementById('result').style.display = 'block';
-            document.getElementById('topic').value = item.title;
-        }
-    }
-    
-    async function generate() {
-        const topic = document.getElementById('topic').value.trim();
-        if (!topic) {
-            document.getElementById('error').innerHTML = "Please enter a topic";
-            document.getElementById('error').style.display = 'block';
-            return;
-        }
-        
-        const type = document.getElementById('type').value;
-        let prompt = "";
-        if (type === "blog") prompt = `Write a short blog post about: ${topic}`;
-        else if (type === "social") prompt = `Write a social media caption about: ${topic}`;
-        else prompt = `Write a short email newsletter about: ${topic}`;
-        
-        document.getElementById('loading').style.display = 'block';
-        document.getElementById('result').style.display = 'none';
-        document.getElementById('error').style.display = 'none';
-        document.getElementById('generateBtn').disabled = true;
-        
-        try {
-            const response = await fetch(WORKER_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: prompt })
-            });
+        for (const ai of aiTools) {
+            const reviews = allReviews[ai.id] || [];
+            const avgRating = getAverageRating(ai.id);
             
-            const data = await response.json();
-            let content = data.content || `✨ **AI-Generated Content About: ${topic}**\n\nHere is your custom AI-generated content. Complete the offer above to unlock unlimited access!`;
+            const reviewHtml = reviews.map(review => `
+                <div class="review-item">
+                    <div class="review-user">${review.user} <span>${review.date}</span></div>
+                    <div class="review-stars">${renderStars(review.rating)}</div>
+                    <div class="review-text">💬 ${review.review}</div>
+                    ${review.good ? `<div class="good">✅ Good: ${review.good}</div>` : ''}
+                    ${review.improvement ? `<div class="improvement">⚠️ Needs improvement: ${review.improvement}</div>` : ''}
+                </div>
+            `).join('');
             
-            // Save to history
-            const userHistory = contentHistory[currentUser.email] || [];
-            const newItem = {
-                id: Date.now(),
-                title: topic,
-                content: content,
-                date: new Date().toLocaleString(),
-                timestamp: new Date().toISOString(),
-                type: type
-            };
-            userHistory.push(newItem);
-            contentHistory[currentUser.email] = userHistory;
-            localStorage.setItem('ai_history', JSON.stringify(contentHistory));
+            const card = `
+                <div class="ai-card">
+                    <div class="ai-header">
+                        <div>
+                            <span class="ai-name">${ai.icon} ${ai.name}</span>
+                            <span class="ai-category">${ai.category}</span>
+                        </div>
+                    </div>
+                    <div class="rating">
+                        ${renderStars(Math.round(avgRating))}
+                        <span class="rating-number">${avgRating} (${reviews.length} reviews)</span>
+                    </div>
+                    <div class="ai-description">${ai.description}</div>
+                    
+                    <div class="stats">
+                        <div class="stat">📊 ${reviews.length} total reviews</div>
+                        <div class="stat">⭐ ${avgRating || 'No'} average rating</div>
+                    </div>
+                    
+                    <div class="review-form">
+                        <h4>📝 Write a Review</h4>
+                        <div class="star-rating">
+                            <input type="radio" name="rating_${ai.id}" value="5" id="star5_${ai.id}"><label for="star5_${ai.id}">★</label>
+                            <input type="radio" name="rating_${ai.id}" value="4" id="star4_${ai.id}"><label for="star4_${ai.id}">★</label>
+                            <input type="radio" name="rating_${ai.id}" value="3" id="star3_${ai.id}"><label for="star3_${ai.id}">★</label>
+                            <input type="radio" name="rating_${ai.id}" value="2" id="star2_${ai.id}"><label for="star2_${ai.id}">★</label>
+                            <input type="radio" name="rating_${ai.id}" value="1" id="star1_${ai.id}"><label for="star1_${ai.id}">★</label>
+                        </div>
+                        <textarea id="review_${ai.id}" class="review-input" rows="2" placeholder="What do you think about this AI? (required)"></textarea>
+                        <textarea id="good_${ai.id}" class="review-input" rows="1" placeholder="What's GOOD about this AI? (optional)"></textarea>
+                        <textarea id="improvement_${ai.id}" class="review-input" rows="1" placeholder="What NEEDS IMPROVEMENT? (optional)"></textarea>
+                        <button class="submit-review" onclick="submitReview(${ai.id})">Submit Review</button>
+                    </div>
+                    
+                    <div class="reviews-list">
+                        <h4>📖 User Reviews (${reviews.length})</h4>
+                        ${reviews.length === 0 ? '<div class="no-reviews">Be the first to review this AI tool!</div>' : reviewHtml}
+                    </div>
+                </div>
+            `;
             
-            updateHistoryDisplay(userHistory);
-            updateStats(userHistory);
-            
-            document.getElementById('result').innerHTML = content.replace(/\n/g, '<br>');
-            document.getElementById('result').style.display = 'block';
-            
-        } catch (err) {
-            document.getElementById('error').innerHTML = "Error generating content. Please try again.";
-            document.getElementById('error').style.display = 'block';
+            container.innerHTML += card;
         }
-        
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('generateBtn').disabled = false;
     }
     
-    // Check for existing session
-    const savedUser = localStorage.getItem('ai_current_user');
-    if (savedUser) {
-        currentUser = JSON.parse(savedUser);
-        if (users[currentUser.email]) {
-            loadDashboard();
-        }
-    }
-    
-    document.getElementById('generateBtn').addEventListener('click', generate);
+    displayAI();
 </script>
 </body>
 </html>
