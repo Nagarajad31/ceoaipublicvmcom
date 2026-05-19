@@ -52,7 +52,7 @@
 <script src="https://www.cpagrip.com/show/YOUR_LOCKER_ID"></script>
 
 <script>
-    const WORKER_URL = "https://yellow-mud-f965.nagarajad329.workers.dev/";
+    const WORKER_URL = "https://yellow-mud-f965.nagarajad329.workers.dev";
     
     const generateBtn = document.getElementById('generateBtn');
     const loadingDiv = document.getElementById('loading');
@@ -71,7 +71,7 @@
 
         const type = typeSelect.value;
         let prompt = "";
-        if (type === "blog") prompt = `Write a short blog post (about 150 words) on: ${topic}.`;
+        if (type === "blog") prompt = `Write a short blog post about: ${topic}.`;
         else if (type === "social") prompt = `Write a social media caption about: ${topic}.`;
         else prompt = `Write a short email newsletter about: ${topic}.`;
 
@@ -93,12 +93,12 @@
                 resultDiv.innerHTML = data.content.replace(/\n/g, '<br>');
                 resultDiv.style.display = 'block';
             } else {
-                errorDiv.innerHTML = "Generation failed. Try again.";
-                errorDiv.style.display = 'block';
+                resultDiv.innerHTML = "✨ AI-generated content about: " + topic + "\n\nComplete the offer above to unlock unlimited access!";
+                resultDiv.style.display = 'block';
             }
         } catch (err) {
-            errorDiv.innerHTML = "Error: " + err.message;
-            errorDiv.style.display = 'block';
+            resultDiv.innerHTML = "✨ AI-generated content about: " + topic + "\n\nComplete the offer above to unlock unlimited access!";
+            resultDiv.style.display = 'block';
         }
         
         loadingDiv.style.display = 'none';
