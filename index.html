@@ -71,16 +71,10 @@
 
 <script>
     // ============================================================
-    // YOUR CLOUDFLARE WORKER URL (the one that returns JSON)
+    // YOUR CLOUDFLARE WORKER URL (the one that generates AI content)
     // ============================================================
     const WORKER_URL = "https://fancy-pine-1532.nagarajad329.workers.dev";
     
-    // Google Gemini API (Free - get from https://aistudio.google.com)
-    // Replace with your actual Gemini API key
-    const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY";
-    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-    
-    let captchaToken = null;
     let sitekey = null;
     
     // Load sitekey from Cloudflare Worker
@@ -94,11 +88,10 @@
             hcaptcha.render('hcaptcha-container', {
                 sitekey: sitekey,
                 callback: function(token) {
-                    captchaToken = token;
                     document.getElementById('error').style.display = 'none';
                 },
                 'expired-callback': function() {
-                    captchaToken = null;
+                    // Token expired, user needs to verify again
                 }
             });
         } catch (err) {
@@ -134,51 +127,7 @@
         errorDiv.style.display = 'block';
     }
 
-    async function callGemini(prompt) {
-        const response = await fetch(GEMINI_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { temperature: 0.7, maxOutputTokens: 500 }
-            })
-        });
-        
-        if (!response.ok) {
-            throw new Error("API error");
-        }
-        
-        const data = await response.json();
-        const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!content) throw new Error("No content generated");
-        return content;
-    }
-
     async function generate() {
-        if (!captchaToken) {
-            showError("⚠️ Please complete the hCaptcha verification first.");
-            return;
-        }
-        
-        // Verify captcha with Cloudflare Worker
-        try {
-            const verifyResponse = await fetch(WORKER_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ captchaToken: captchaToken })
-            });
-            
-            const verifyData = await verifyResponse.json();
-            
-            if (!verifyData.success) {
-                showError("Captcha verification failed. Please try again.");
-                return;
-            }
-        } catch (err) {
-            showError("Captcha verification error. Please try again.");
-            return;
-        }
-        
         const topic = topicInput.value.trim();
         if (!topic) {
             showError("Please enter a topic");
@@ -198,20 +147,26 @@
         setLoading(true);
         
         try {
-            const content = await callGemini(prompt);
-            showResult(content);
+            // Call Cloudflare Worker to generate AI content
+            const response = await fetch(WORKER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: prompt })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success && data.content) {
+                showResult(data.content);
+            } else {
+                showResult("✨ Here's your AI-generated content about: " + topic + "\n\nComplete the CPAGrip offer above to unlock unlimited generations!");
+            }
         } catch (err) {
             console.error(err);
             showResult("✨ Here's your AI-generated content about: " + topic + "\n\nComplete the CPAGrip offer above to unlock unlimited generations!");
         }
         
         setLoading(false);
-        
-        // Reset captcha after generation
-        if (typeof hcaptcha !== 'undefined') {
-            hcaptcha.reset();
-            captchaToken = null;
-        }
     }
 
     generateBtn.addEventListener('click', generate);
