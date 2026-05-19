@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Content Studio | Free AI Writer</title>
+    <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:system-ui,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px;}
+        .container{max-width:900px;margin:0 auto;background:white;border-radius:28px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);overflow:hidden;}
+        .header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:2rem;text-align:center;}
+        .header h1{font-size:1.8rem;margin-bottom:0.3rem;}
+        .content{padding:2rem;}
+        .input-group{margin-bottom:1.5rem;}
+        label{font-weight:600;display:block;margin-bottom:0.5rem;color:#1f2937;}
+        textarea,select{width:100%;padding:0.8rem;border:1.5px solid #e5e7eb;border-radius:16px;font-size:1rem;font-family:inherit;}
+        textarea:focus,select:focus{outline:none;border-color:#667eea;}
+        button{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;padding:0.8rem;font-size:1rem;font-weight:600;border-radius:40px;cursor:pointer;width:100%;margin-top:1rem;}
+        .h-captcha{margin:20px 0;display:flex;justify-content:center;}
+        .loading{text-align:center;padding:2rem;display:none;}
+        .spinner{width:40px;height:40px;border:3px solid #e5e7eb;border-top-color:#667eea;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem;}
+        @keyframes spin{to{transform:rotate(360deg);}}
+        .result{margin-top:2rem;padding:1.5rem;background:#f9fafb;border-radius:24px;display:none;white-space:pre-wrap;line-height:1.6;}
+        .error{color:#dc2626;background:#fef2f2;padding:1rem;border-radius:16px;margin-top:1rem;display:none;}
+        .features{display:flex;justify-content:space-between;margin-top:2rem;padding-top:1.5rem;border-top:1px solid #e5e7eb;}
+        .feature{text-align:center;flex:1;}
+        .feature span{font-size:1.5rem;display:block;}
+        .feature p{font-size:0.75rem;color:#6b7280;}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>✨ AI Content Studio</h1>
+        <p>Generate unique content instantly with AI</p>
+    </div>
+    <div class="content">
+        <div class="input-group">
+            <label>🧠 Topic</label>
+            <textarea id="topic" rows="3" placeholder="e.g., How to stay productive, Benefits of meditation, Social media tips..."></textarea>
+        </div>
+        <div class="input-group">
+            <label>📌 Content type</label>
+            <select id="type">
+                <option value="blog">📝 Blog Post</option>
+                <option value="social">📱 Social Media Caption</option>
+                <option value="email">✉️ Newsletter</option>
+            </select>
+        </div>
+        
+        <!-- hCaptcha will be loaded here -->
+        <div id="hcaptcha-container" class="h-captcha"></div>
+        
+        <button id="generateBtn">✨ Generate Content</button>
+
+        <div class="loading" id="loading"><div class="spinner"></div><p>AI is writing...</p></div>
+        <div class="result" id="result"></div>
+        <div class="error" id="error"></div>
+        
+        <div class="features">
+            <div class="feature"><span>⚡</span><p>Real-time</p></div>
+            <div class="feature"><span>🎯</span><p>Unique</p></div>
+            <div class="feature"><span>🆓</span><p>Free</p></div>
+        </div>
+    </div>
+</div>
+
+<!-- CPAGrip Locker - Replace with your actual locker ID -->
+<script src="https://www.cpagrip.com/show/YOUR_LOCKER_ID"></script>
+
+<script>
+    // ============================================================
+    // YOUR CLOUDFLARE WORKER URL (the one that returns JSON)
+    // ============================================================
+    const WORKER_URL = "https://fancy-pine-1532.nagarajad329.workers.dev";
+    
+    // Google Gemini API (Free - get from https://aistudio.google.com)
+    // Replace with your actual Gemini API key
+    const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY";
+    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    
+    let captchaToken = null;
+    let sitekey = null;
+    
+    // Load sitekey from Cloudflare Worker
+    async function loadSitekey() {
+        try {
+            const response = await fetch(WORKER_URL);
+            const data = await response.json();
+            sitekey = data.sitekey;
+            
+            // Render hCaptcha
+            hcaptcha.render('hcaptcha-container', {
+                sitekey: sitekey,
+                callback: function(token) {
+                    captchaToken = token;
+                    document.getElementById('error').style.display = 'none';
+                },
+                'expired-callback': function() {
+                    captchaToken = null;
+                }
+            });
+        } catch (err) {
+            console.error("Failed to load sitekey:", err);
+        }
+    }
+    
+    loadSitekey();
+    
+    const generateBtn = document.getElementById('generateBtn');
+    const loadingDiv = document.getElementById('loading');
+    const resultDiv = document.getElementById('result');
+    const errorDiv = document.getElementById('error');
+    const topicInput = document.getElementById('topic');
+    const typeSelect = document.getElementById('type');
+
+    function setLoading(isLoading) {
+        loadingDiv.style.display = isLoading ? 'block' : 'none';
+        generateBtn.disabled = isLoading;
+        if (!isLoading) {
+            resultDiv.style.display = 'none';
+            errorDiv.style.display = 'none';
+        }
+    }
+
+    function showResult(content) {
+        resultDiv.innerHTML = content.replace(/\n/g, '<br>');
+        resultDiv.style.display = 'block';
+    }
+
+    function showError(message) {
+        errorDiv.innerHTML = message;
+        errorDiv.style.display = 'block';
+    }
+
+    async function callGemini(prompt) {
+        const response = await fetch(GEMINI_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.7, maxOutputTokens: 500 }
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error("API error");
+        }
+        
+        const data = await response.json();
+        const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!content) throw new Error("No content generated");
+        return content;
+    }
+
+    async function generate() {
+        if (!captchaToken) {
+            showError("⚠️ Please complete the hCaptcha verification first.");
+            return;
+        }
+        
+        // Verify captcha with Cloudflare Worker
+        try {
+            const verifyResponse = await fetch(WORKER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ captchaToken: captchaToken })
+            });
+            
+            const verifyData = await verifyResponse.json();
+            
+            if (!verifyData.success) {
+                showError("Captcha verification failed. Please try again.");
+                return;
+            }
+        } catch (err) {
+            showError("Captcha verification error. Please try again.");
+            return;
+        }
+        
+        const topic = topicInput.value.trim();
+        if (!topic) {
+            showError("Please enter a topic");
+            return;
+        }
+
+        const type = typeSelect.value;
+        let prompt = "";
+        if (type === "blog") {
+            prompt = `Write a short, engaging blog post (about 150-200 words) on: ${topic}. Include an introduction, 2 key points, and a conclusion. Make it friendly and informative.`;
+        } else if (type === "social") {
+            prompt = `Write an engaging social media caption (2-3 sentences) with relevant hashtags about: ${topic}.`;
+        } else {
+            prompt = `Write a short email newsletter (about 100-150 words) about: ${topic}. Include a subject line and a call to action.`;
+        }
+
+        setLoading(true);
+        
+        try {
+            const content = await callGemini(prompt);
+            showResult(content);
+        } catch (err) {
+            console.error(err);
+            showResult("✨ Here's your AI-generated content about: " + topic + "\n\nComplete the CPAGrip offer above to unlock unlimited generations!");
+        }
+        
+        setLoading(false);
+        
+        // Reset captcha after generation
+        if (typeof hcaptcha !== 'undefined') {
+            hcaptcha.reset();
+            captchaToken = null;
+        }
+    }
+
+    generateBtn.addEventListener('click', generate);
+</script>
+</body>
+</html>
