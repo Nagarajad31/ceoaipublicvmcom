@@ -23,6 +23,56 @@
             margin: 0 auto;
         }
         
+        /* Stats Bar */
+        .stats-bar {
+            background: rgba(255,255,255,0.95);
+            border-radius: 60px;
+            padding: 12px 25px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .stat-number {
+            font-weight: 800;
+            color: #667eea;
+            font-size: 18px;
+        }
+        
+        .online-dot {
+            width: 10px;
+            height: 10px;
+            background: #2ecc71;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0.3; transform: scale(1.2); }
+        }
+        
+        .timer-badge {
+            background: #f0f0f0;
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-size: 12px;
+            color: #e67e22;
+        }
+        
         h1 {
             color: white;
             margin-bottom: 10px;
@@ -36,7 +86,6 @@
             font-size: 1.1rem;
         }
         
-        /* Comment Form */
         .comment-form {
             background: white;
             padding: 28px;
@@ -98,7 +147,6 @@
             box-shadow: 0 8px 20px rgba(102,126,234,0.4);
         }
         
-        /* Comments Section */
         .comments-section {
             background: white;
             border-radius: 20px;
@@ -113,6 +161,17 @@
             padding-bottom: 12px;
             border-bottom: 3px solid #667eea;
             color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .review-count {
+            font-size: 14px;
+            background: #667eea20;
+            padding: 5px 12px;
+            border-radius: 40px;
+            color: #667eea;
         }
         
         .comment-card {
@@ -216,7 +275,6 @@
             cursor: pointer;
         }
         
-        /* Responsive */
         @media (max-width: 600px) {
             body {
                 padding: 20px 15px;
@@ -227,11 +285,36 @@
             .comment-form, .comments-section {
                 padding: 18px;
             }
+            .stats-bar {
+                flex-direction: column;
+                align-items: stretch;
+                border-radius: 20px;
+            }
         }
     </style>
 </head>
 <body>
 <div class="container">
+    
+    <!-- Stats Bar with Fake Numbers -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="online-dot"></span>
+            <span><span class="stat-number" id="liveUsers">1,247</span> users online now</span>
+        </div>
+        <div class="stat-item">
+            <span>👥</span>
+            <span><span class="stat-number">2,841</span> total reviews</span>
+        </div>
+        <div class="stat-item">
+            <span>⭐</span>
+            <span><span class="stat-number">4.8</span> average rating</span>
+        </div>
+        <div class="timer-badge" id="timerDisplay">
+            ⏱️ Last review: just now
+        </div>
+    </div>
+    
     <h1>💬 AI Reviews</h1>
     <p class="subtitle">Real users share their experience with AI tools</p>
     
@@ -282,10 +365,11 @@
     
     <!-- Comments List -->
     <div class="comments-section">
-        <div class="section-title">📢 User Reviews</div>
-        <div id="commentsList">
-            <div class="empty-message">No reviews yet. Be the first to share your thoughts!</div>
+        <div class="section-title">
+            📢 User Reviews
+            <span class="review-count" id="reviewCount">0 reviews</span>
         </div>
+        <div id="commentsList"></div>
     </div>
 </div>
 
@@ -293,7 +377,38 @@
     // Load comments from localStorage
     let comments = JSON.parse(localStorage.getItem('ai_comments')) || [];
     
+    // Pre-load sample reviews if empty (to look like 1000+ users)
+    if(comments.length === 0) {
+        const sampleReviews = [
+            { id: 1700000000001, name: "Michael Chen", ai: "ChatGPT", comment: "Absolutely love ChatGPT! It helped me write my thesis and debug code. 10/10 would recommend.", rating: 5, date: "2026-05-20 14:23:00" },
+            { id: 1700000000002, name: "Sarah Johnson", ai: "Midjourney", comment: "Midjourney v6 is insane. The art quality is unmatched. A bit pricey but worth it for professionals.", rating: 5, date: "2026-05-20 12:15:00" },
+            { id: 1700000000003, name: "David Kim", ai: "Claude", comment: "Claude 3 is great for long context tasks. Better than GPT-4 for document analysis.", rating: 4, date: "2026-05-20 09:47:00" },
+            { id: 1700000000004, name: "Emma Watson", ai: "Google Gemini", comment: "Gemini is improving fast. The YouTube summarization feature is a game changer.", rating: 4, date: "2026-05-19 22:10:00" },
+            { id: 1700000000005, name: "James Rodriguez", ai: "Perplexity AI", comment: "Best for research! Real-time citations and no hallucinations. My go-to for work.", rating: 5, date: "2026-05-19 18:30:00" },
+            { id: 1700000000006, name: "Lisa Wang", ai: "DeepSeek", comment: "DeepSeek is underrated. Super fast and free. Great for coding help.", rating: 4, date: "2026-05-19 15:45:00" },
+            { id: 1700000000007, name: "Tom Harris", ai: "Leonardo.ai", comment: "Leonardo is perfect for game assets. The real-time generation is impressive.", rating: 5, date: "2026-05-19 11:20:00" },
+            { id: 1700000000008, name: "Nina Patel", ai: "Copy.ai", comment: "Good for social media captions but repetitive. Still useful for beginners.", rating: 3, date: "2026-05-18 20:00:00" }
+        ];
+        comments = sampleReviews;
+        localStorage.setItem('ai_comments', JSON.stringify(comments));
+    }
+    
     let currentRating = 0;
+    
+    // Random timer update (last review time)
+    function updateTimer() {
+        const times = ["just now", "2 min ago", "5 min ago", "12 min ago", "1 hour ago"];
+        const randomTime = times[Math.floor(Math.random() * times.length)];
+        document.getElementById('timerDisplay').innerHTML = `⏱️ Last review: ${randomTime}`;
+    }
+    setInterval(updateTimer, 30000);
+    
+    // Random live user count (fluctuates between 800-1500)
+    function updateLiveUsers() {
+        const randomUsers = Math.floor(Math.random() * (1550 - 800 + 1) + 800);
+        document.getElementById('liveUsers').innerText = randomUsers.toLocaleString();
+    }
+    setInterval(updateLiveUsers, 45000);
     
     function setRating(rating) {
         currentRating = rating;
@@ -350,6 +465,9 @@
         document.getElementById('comment').value = '';
         setRating(0);
         
+        // Update timer to "just now"
+        document.getElementById('timerDisplay').innerHTML = `⏱️ Last review: just now`;
+        
         displayComments();
     }
     
@@ -361,11 +479,15 @@
     
     function displayComments() {
         const container = document.getElementById('commentsList');
+        const reviewCountSpan = document.getElementById('reviewCount');
         
         if (comments.length === 0) {
             container.innerHTML = '<div class="empty-message">No reviews yet. Be the first to share your thoughts!</div>';
+            reviewCountSpan.innerText = "0 reviews";
             return;
         }
+        
+        reviewCountSpan.innerText = comments.length + " reviews";
         
         container.innerHTML = comments.map(comment => `
             <div class="comment-card">
@@ -390,6 +512,7 @@
     }
     
     displayComments();
+    updateLiveUsers();
 </script>
 
 <!-- ============================================ -->
