@@ -12,53 +12,68 @@
         }
         
         body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f5f5f5;
-            padding: 20px;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
         }
         
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
         
         h1 {
-            color: #333;
+            color: white;
             margin-bottom: 10px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
         
         .subtitle {
-            color: #666;
+            color: rgba(255,255,255,0.9);
             margin-bottom: 30px;
+            font-size: 1.1rem;
         }
         
         /* Comment Form */
         .comment-form {
             background: white;
-            padding: 20px;
-            border-radius: 12px;
+            padding: 28px;
+            border-radius: 20px;
             margin-bottom: 30px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
         }
         
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         label {
             display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-weight: 600;
+            margin-bottom: 8px;
             color: #333;
+            font-size: 14px;
         }
         
-        input, textarea {
+        input, textarea, select {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
             font-size: 14px;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
         }
         
         textarea {
@@ -66,100 +81,152 @@
         }
         
         button {
-            background: #007bff;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 12px 28px;
+            border-radius: 40px;
             cursor: pointer;
             font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         
         button:hover {
-            background: #0069d9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102,126,234,0.4);
         }
         
-        /* Comments List */
+        /* Comments Section */
         .comments-section {
             background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
         }
         
         .section-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #f0f0f0;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #667eea;
+            color: #333;
         }
         
         .comment-card {
-            background: #fafafa;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            border-left: 4px solid #007bff;
+            background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+            padding: 18px;
+            border-radius: 16px;
+            margin-bottom: 18px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        
+        .comment-card:hover {
+            transform: translateX(5px);
         }
         
         .comment-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
         }
         
         .comment-name {
-            font-weight: bold;
-            color: #007bff;
+            font-weight: 800;
+            color: #667eea;
             font-size: 16px;
+            background: rgba(102,126,234,0.1);
+            padding: 4px 12px;
+            border-radius: 40px;
         }
         
         .comment-date {
             color: #999;
-            font-size: 12px;
+            font-size: 11px;
+            background: #f0f0f0;
+            padding: 4px 10px;
+            border-radius: 20px;
         }
         
         .comment-text {
-            color: #333;
-            line-height: 1.5;
-            margin-bottom: 10px;
+            color: #444;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            font-size: 14px;
         }
         
         .comment-ai {
             display: inline-block;
-            background: #e0e0e0;
-            padding: 3px 10px;
-            border-radius: 15px;
+            background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+            padding: 4px 14px;
+            border-radius: 40px;
             font-size: 12px;
-            color: #555;
+            font-weight: 600;
+            color: #667eea;
+            margin-top: 5px;
         }
         
         .empty-message {
-            color: #999;
+            color: #aaa;
             text-align: center;
-            padding: 30px;
+            padding: 40px;
+            font-size: 15px;
         }
         
         .rating {
-            color: #ffc107;
-            font-size: 14px;
-            margin-bottom: 5px;
+            color: #f5b042;
+            font-size: 18px;
+            margin: 8px 0;
+            letter-spacing: 2px;
         }
         
         .delete-btn {
-            background: #dc3545;
+            background: #ff4757;
             color: white;
             border: none;
-            padding: 3px 10px;
-            border-radius: 5px;
+            padding: 5px 14px;
+            border-radius: 40px;
             cursor: pointer;
             font-size: 11px;
+            font-weight: 600;
+            transition: all 0.2s;
         }
         
         .delete-btn:hover {
-            background: #c82333;
+            background: #e03e4e;
+            transform: scale(1.03);
+        }
+        
+        #ratingSelect span {
+            font-size: 28px;
+            transition: transform 0.1s;
+        }
+        
+        #ratingSelect span:hover {
+            transform: scale(1.1);
+        }
+        
+        select {
+            cursor: pointer;
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            body {
+                padding: 20px 15px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .comment-form, .comments-section {
+                padding: 18px;
+            }
         }
     </style>
 </head>
@@ -170,7 +237,7 @@
     
     <!-- Comment Form -->
     <div class="comment-form">
-        <h3 style="margin-bottom: 15px;">📝 Share Your Experience</h3>
+        <h3 style="margin-bottom: 18px; color: #333;">📝 Share Your Experience</h3>
         
         <div class="form-group">
             <label>👤 Your Name</label>
@@ -328,7 +395,6 @@
 <!-- ============================================ -->
 <!-- CPAGRIP CONTENT LOCKER - ADDED HERE           -->
 <!-- ============================================ -->
-
 
 </body>
 </html>
