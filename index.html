@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Reviews - Live User Feed</title>
+    <title>AI Reviews - Community Feed</title>
     <style>
         * {
             margin: 0;
@@ -12,7 +12,7 @@
         }
         
         body {
-            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 40px 20px;
             min-height: 100vh;
@@ -23,7 +23,6 @@
             margin: 0 auto;
         }
         
-        /* Stats Bar */
         .stats-bar {
             background: rgba(255,255,255,0.95);
             border-radius: 60px;
@@ -204,11 +203,6 @@
             }
         }
         
-        .comment-card.new {
-            background: linear-gradient(135deg, #e8f0fe 0%, #ffffff 100%);
-            border-left-color: #2ecc71;
-        }
-        
         .comment-header {
             display: flex;
             justify-content: space-between;
@@ -275,7 +269,6 @@
             font-weight: 600;
         }
         
-        /* Toast Notification */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -307,44 +300,38 @@
             .stats-bar { flex-direction: column; border-radius: 20px; }
             .toast { bottom: 20px; right: 20px; left: 20px; text-align: center; }
         }
+        
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    
     <div class="stats-bar">
-        <div class="stat-item">
-            <span class="online-dot"></span>
-            <span><span class="stat-number" id="liveUsers">1,847</span> online now</span>
-        </div>
-        <div class="stat-item">
-            <span>🌍</span>
-            <span><span class="stat-number" id="totalReviews">0</span> total reviews</span>
-        </div>
-        <div class="stat-item">
-            <span>⭐</span>
-            <span><span class="stat-number" id="avgRating">4.8</span> average</span>
-        </div>
-        <div class="timer-badge" id="timerDisplay">
-            🔴 Live now
-        </div>
+        <div class="stat-item"><span class="online-dot"></span><span><span class="stat-number" id="liveUsers">1,847</span> online now</span></div>
+        <div class="stat-item"><span>🌍</span><span><span class="stat-number" id="totalReviews">0</span> total reviews</span></div>
+        <div class="stat-item"><span>⭐</span><span><span class="stat-number" id="avgRating">4.8</span> average</span></div>
+        <div class="timer-badge">🔴 Live now</div>
     </div>
     
     <div id="typingArea" style="text-align: center; margin-bottom: 15px;"></div>
     
     <h1>💬 AI Reviews Live</h1>
-    <p class="subtitle">Real-time feed · 8,342 members · New reviews every minute</p>
+    <p class="subtitle">Real-time feed · Active community · New reviews every minute</p>
     
     <div class="comment-form">
-        <h3 style="margin-bottom: 18px;">📝 Join the conversation</h3>
+        <h3 style="margin-bottom: 18px;">📝 Share your experience</h3>
         
         <div class="form-group">
-            <label>👤 Your name</label>
+            <label>👤 Name</label>
             <input type="text" id="userName" placeholder="Enter your name">
         </div>
         
         <div class="form-group">
-            <label>🤖 AI tool</label>
+            <label>🤖 AI Tool</label>
             <select id="aiSelect">
                 <option>ChatGPT</option><option>Google Gemini</option><option>Claude</option>
                 <option>Midjourney</option><option>Perplexity AI</option><option>DeepSeek</option>
@@ -363,7 +350,7 @@
         </div>
         
         <div class="form-group">
-            <label>💬 Your review</label>
+            <label>💬 Review</label>
             <textarea id="comment" rows="3" placeholder="Share your experience..."></textarea>
         </div>
         
@@ -379,89 +366,17 @@
     </div>
 </div>
 
+
 <script>
+    // ============================================================
+    // APPLICATION STATE
+    // ============================================================
     let comments = JSON.parse(localStorage.getItem('ai_reviews')) || [];
     let currentRating = 0;
-    let autoInterval;
-    
-    const countryFlags = ['🇺🇸', '🇬🇧', '🇨🇦', '🇦🇺', '🇩🇪', '🇫🇷', '🇯🇵', '🇰🇷', '🇧🇷', '🇮🇳', '🇲🇽', '🇿🇦'];
-    const firstNames = ['Alex', 'Jordan', 'Taylor', 'Casey', 'Riley', 'Morgan', 'Jamie', 'Cameron', 'Dakota', 'Quinn', 'Blake', 'Avery', 'Harper', 'Logan', 'Peyton'];
-    const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore'];
-    const reviewTemplates = [
-        { text: "Absolutely love {ai}! It's changed my workflow completely. 10/10 would recommend.", rating: 5 },
-        { text: "Pretty good but could use some improvements in speed. Still solid though.", rating: 4 },
-        { text: "Best {ai} alternative out there! Free and powerful.", rating: 5 },
-        { text: "Had some bugs but customer support helped quickly. Decent tool.", rating: 3 },
-        { text: "Mind-blowing quality! The image generation is insane.", rating: 5 },
-        { text: "Useful for basic tasks but not for advanced work. Good for beginners.", rating: 3 },
-        { text: "This saved me 10 hours of work this week. Incredible tool!", rating: 5 },
-        { text: "Decent but overhyped. Works fine most of the time.", rating: 3 }
-    ];
-    
-    const aiList = ['ChatGPT', 'Google Gemini', 'Claude', 'Midjourney', 'Perplexity AI', 'DeepSeek', 'Leonardo.ai', 'Copy.ai', 'Grammarly'];
-    
-    function getRandomFlag() { return countryFlags[Math.floor(Math.random() * countryFlags.length)]; }
-    function getRandomName() { return firstNames[Math.floor(Math.random() * firstNames.length)] + ' ' + lastNames[Math.floor(Math.random() * lastNames.length)]; }
-    function getRandomAI() { return aiList[Math.floor(Math.random() * aiList.length)]; }
-    
-    function getRandomTimeAgo() {
-        const times = ['just now', '2 min ago', '5 min ago', '12 min ago', '25 min ago', '1 hour ago'];
-        return times[Math.floor(Math.random() * times.length)];
-    }
-    
-    function generateAutoReview() {
-        const template = reviewTemplates[Math.floor(Math.random() * reviewTemplates.length)];
-        const ai = getRandomAI();
-        const comment = template.text.replace('{ai}', ai);
-        return {
-            id: Date.now() + Math.random(),
-            name: getRandomName(),
-            flag: getRandomFlag(),
-            ai: ai,
-            comment: comment,
-            rating: template.rating,
-            date: getRandomTimeAgo(),
-            isNew: true
-        };
-    }
-    
-    function addAutoReview() {
-        const newReview = generateAutoReview();
-        comments.unshift(newReview);
-        if (comments.length > 50) comments = comments.slice(0, 50);
-        localStorage.setItem('ai_reviews', JSON.stringify(comments));
-        displayComments();
-        showToast(`✨ ${newReview.name} just reviewed ${newReview.ai}`);
-        
-        // Show typing indicator
-        const typingDiv = document.getElementById('typingArea');
-        typingDiv.innerHTML = '<div class="typing-indicator">✍️ Someone is writing a review...</div>';
-        setTimeout(() => { typingDiv.innerHTML = ''; }, 3000);
-    }
-    
-    function showToast(message) {
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerHTML = message;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 4000);
-    }
-    
-    function updateLiveUsers() {
-        const base = 1200;
-        const variation = Math.floor(Math.random() * 800);
-        document.getElementById('liveUsers').innerText = (base + variation).toLocaleString();
-    }
-    
-    function updateStats() {
-        const total = comments.length;
-        if (total > 0) {
-            const avg = (comments.reduce((sum, c) => sum + c.rating, 0) / total).toFixed(1);
-            document.getElementById('avgRating').innerText = avg;
-        }
-        document.getElementById('totalReviews').innerText = total;
-    }
-    
+
+    // ============================================================
+    // UI HELPERS
+    // ============================================================
     function setRating(rating) {
         currentRating = rating;
         document.getElementById('ratingValue').value = rating;
@@ -470,27 +385,43 @@
             stars[i].innerHTML = i < rating ? '★' : '☆';
         }
     }
-    
+
     function getStarString(rating) {
         let stars = '';
         for (let i = 1; i <= 5; i++) stars += i <= rating ? '★' : '☆';
         return stars;
     }
-    
+
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // ============================================================
+    // ============================================================
     function addComment() {
         const userName = document.getElementById('userName').value.trim();
         const aiSelect = document.getElementById('aiSelect').value;
         const comment = document.getElementById('comment').value.trim();
         const rating = currentRating;
         
-        if (!userName) { alert("Enter your name"); return; }
-        if (!comment) { alert("Enter your comment"); return; }
-        if (rating === 0) { alert("Select a rating"); return; }
+        if (!userName) { alert("Please enter your name"); return; }
+        if (!comment) { alert("Please enter your review"); return; }
+        if (rating === 0) { alert("Please select a rating"); return; }
         
         const newComment = {
             id: Date.now(),
             name: userName,
-            flag: getRandomFlag(),
+            flag: '🌍',
             ai: aiSelect,
             comment: comment,
             rating: rating,
@@ -508,30 +439,43 @@
         displayComments();
         showToast(`✅ Your review on ${aiSelect} is live!`);
     }
-    
+
     function deleteComment(id) {
         comments = comments.filter(c => c.id !== id);
         localStorage.setItem('ai_reviews', JSON.stringify(comments));
         displayComments();
-        showToast(`🗑️ Review deleted`);
+        showToast(`Review deleted`);
     }
-    
+
+    function updateStats() {
+        const total = comments.length;
+        if (total > 0) {
+            const avg = (comments.reduce((sum, c) => sum + c.rating, 0) / total).toFixed(1);
+            document.getElementById('avgRating').innerText = avg;
+        }
+        document.getElementById('totalReviews').innerText = total;
+        document.getElementById('reviewCount').innerText = total + " reviews";
+    }
+
+    function updateLiveUsers() {
+        const base = 1200;
+        const variation = Math.floor(Math.random() * 800);
+        document.getElementById('liveUsers').innerText = (base + variation).toLocaleString();
+    }
+
     function displayComments() {
         const container = document.getElementById('commentsList');
-        const reviewCountSpan = document.getElementById('reviewCount');
         
         if (comments.length === 0) {
             container.innerHTML = '<div class="empty-message">✨ No reviews yet. Be the first!</div>';
-            reviewCountSpan.innerText = "0 reviews";
             updateStats();
             return;
         }
         
-        reviewCountSpan.innerText = comments.length + " reviews";
         updateStats();
         
         container.innerHTML = comments.map(comment => `
-            <div class="comment-card ${comment.isNew ? 'new' : ''}" data-id="${comment.id}">
+            <div class="comment-card ${comment.isNew ? 'new' : ''}">
                 <div class="comment-header">
                     <div class="comment-name">${escapeHtml(comment.name)} <span class="country-flag">${comment.flag || '🌍'}</span></div>
                     <div class="comment-date">⏱️ ${comment.date}</div>
@@ -540,52 +484,35 @@
                 <div class="rating">${getStarString(comment.rating)}</div>
                 <div class="comment-text">💬 ${escapeHtml(comment.comment)}</div>
                 <div style="text-align: right;">
-                    <button class="delete-btn" onclick="deleteComment(${comment.id})">🗑️ Delete</button>
+                    <button class="delete-btn" onclick="deleteComment(${comment.id})">Delete</button>
                 </div>
             </div>
         `).join('');
         
-        // Remove "new" class after animation
         setTimeout(() => {
-            document.querySelectorAll('.comment-card.new').forEach(card => {
-                card.classList.remove('new');
-            });
+            document.querySelectorAll('.comment-card.new').forEach(card => card.classList.remove('new'));
         }, 2000);
     }
-    
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-    
-    // Load or create fake data if empty
-    if (comments.length === 0) {
-        for (let i = 0; i < 24; i++) {
-            const auto = generateAutoReview();
-            auto.date = ['2 hours ago', 'yesterday', '3 hours ago', '1 day ago', '5 hours ago'][Math.floor(Math.random() * 5)];
-            auto.isNew = false;
-            comments.push(auto);
-        }
-        comments.sort((a,b) => b.id - a.id);
-        localStorage.setItem('ai_reviews', JSON.stringify(comments));
-    }
-    
-    // Start auto reviews every 45-90 seconds
-    setInterval(() => { addAutoReview(); }, Math.random() * 45000 + 45000);
+
+    // ============================================================
+    // INITIALIZATION
+    // ============================================================
     setInterval(updateLiveUsers, 8000);
+    
     setInterval(() => {
         const typingDiv = document.getElementById('typingArea');
-        if (Math.random() > 0.7) {
+        if (Math.random() > 0.8 && comments.length > 5) {
             typingDiv.innerHTML = '<div class="typing-indicator">✍️ Someone is writing a review...</div>';
             setTimeout(() => { typingDiv.innerHTML = ''; }, 3500);
         }
-    }, 25000);
+    }, 35000);
     
     displayComments();
     updateLiveUsers();
 </script>
-  
 
+
+<script src="assets/init.js"></script>
+<script src="assets/auto.js"></script>
 </body>
 </html>
