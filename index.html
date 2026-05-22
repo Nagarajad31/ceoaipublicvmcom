@@ -131,6 +131,129 @@
     </div>
 </div>
 
-<script src="init.min.js"></script>
+<script>
+  
+    let comments = [];
+    let currentRating = 0;
+    
+    const flags = ['🇺🇸', '🇬🇧', '🇨🇦', '🇦🇺', '🇩🇪', '🇫🇷', '🇯🇵', '🇰🇷', '🇧🇷', '🇮🇳', '🇲🇽', '🇿🇦'];
+    
+  
+    const API_URL = 'https://noisy-fire-61ac.nagarajad329.workers.dev/';
+    
+    function getRandomFlag() {
+        return flags[Math.floor(Math.random() * flags.length)];
+    }
+    
+    function setRating(rating) {
+        currentRating = rating;
+        document.getElementById('ratingValue').value = rating;
+        const stars = document.querySelectorAll('#ratingSelect span');
+        for (let i = 0; i < stars.length; i++) {
+            stars[i].innerHTML = i < rating ? '★' : '☆';
+        }
+    }
+    
+    function getStarString(rating) {
+        let stars = '';
+        for (let i = 1; i <= 5; i++) stars += i <= rating ? '★' : '☆';
+        return stars;
+    }
+    
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    function updateLiveUsers() {
+        const base = 1200;
+        const variation = Math.floor(Math.random() * 800);
+        document.getElementById('liveUsers').innerText = (base + variation).toLocaleString();
+    }
+    
+    function updateStats() {
+        const total = comments.length;
+        if (total > 0) {
+            const avg = (comments.reduce((sum, c) => sum + c.rating, 0) / total).toFixed(1);
+            document.getElementById('avgRating').innerText = avg;
+        }
+        document.getElementById('totalReviews').innerText = total;
+        document.getElementById('reviewCount').innerText = total + " reviews";
+    }
+    
+    function displayComments() {
+        const container = document.getElementById('commentsList');
+        if (comments.length === 0) {
+            container.innerHTML = '<div class="empty-message">✨ Loading reviews...</div>';
+            return;
+        }
+        updateStats();
+        container.innerHTML = comments.map(comment => `
+            <div class="comment-card">
+                <div class="comment-header">
+                    <div class="comment-name">${escapeHtml(comment.name)} <span class="country-flag">${comment.flag || '🌍'}</span></div>
+                    <div class="comment-date">⏱️ ${comment.date}</div>
+                </div>
+                <div class="comment-ai">🤖 ${escapeHtml(comment.ai)}</div>
+                <div class="rating">${getStarString(comment.rating)}</div>
+                <div class="comment-text">💬 ${escapeHtml(comment.comment)}</div>
+            </div>
+        `).join('');
+    }
+    
+    async function loadComments() {
+        try {
+            // Fetch from Cloudflare API (looks like REAL backend!)
+            const response = await fetch(API_URL);
+            const data = await response.json();
+            comments = data.comments || data;
+            displayComments();
+        } catch (error) {
+            console.error('Error loading comments:', error);
+            document.getElementById('commentsList').innerHTML = '<div class="empty-message">⚠️ Unable to load reviews. Please refresh.</div>';
+        }
+    }
+    
+    function addComment() {
+        const name = document.getElementById('userName').value.trim();
+        const ai = document.getElementById('aiSelect').value;
+        const comment = document.getElementById('comment').value.trim();
+        const rating = currentRating;
+        
+        if (!name) { alert("Please enter your name"); return; }
+        if (!comment) { alert("Please enter your review"); return; }
+        if (rating === 0) { alert("Please select a rating"); return; }
+        
+        const newComment = {
+            id: Date.now(),
+            name: name,
+            flag: getRandomFlag(),
+            ai: ai,
+            comment: comment,
+            rating: rating,
+            date: "just now"
+        };
+        
+        comments.unshift(newComment);
+        displayComments();
+        
+        document.getElementById('userName').value = '';
+        document.getElementById('comment').value = '';
+        setRating(0);
+        showToast(`✅ Your review on ${ai} is live!`);
+    }
+    
+    setInterval(updateLiveUsers, 8000);
+    loadComments();
+</script>
 </body>
 </html>
